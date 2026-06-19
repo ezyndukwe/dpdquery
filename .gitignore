@@ -3,7 +3,7 @@
 .RData
 .Ruserdata
 .positai
-.Rmd
+.RMD
 inst/doc
 docs
 /doc/
