@@ -1,0 +1,41 @@
+Package: dpdquery
+Type: Package
+Title: Query Health Canada Drug Product Database
+Version: 1.0.0.0
+Authors@R: c(
+    person(
+      "Ezinne", "Ndukwe",
+      email = "ezinne.ndukwe@mail.utoronto.com",
+      role = c("aut", "cre", "cph")
+    )
+  )
+Description: Suite of functions designed to query Health Canada's Drug 
+    Product Database(DPD) through component APIs. The DPD is managed by
+    Health Canada and provides information on drugs approved and authorized 
+    for sale in Canada.
+    This package is intended to assist with queries of the DPD for usages in 
+    pharmacological, healthcare and public health research and projects. The 
+    results are returned in an structured dataframe that can be exported to 
+    external files.
+    For more information regarding the DPD and the information provided, please 
+    consult Health Canada resources and contact their team. 
+License: GPL (>= 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 3.5)
+Imports: 
+    dplyr (>= 1.1.0),
+    glue,
+    httr,
+    purrr (>= 1.0.2),
+    tidyr,
+    Hmisc,
+    jsonlite
+Config/testthat/edition: 3
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
