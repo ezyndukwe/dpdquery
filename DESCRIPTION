@@ -18,8 +18,10 @@ Description: Suite of functions designed to query Health Canada's Drug
     results are returned in an structured dataframe that can be exported to 
     external files.
     For more information regarding the DPD and the information provided, please 
-    consult Health Canada resources and contact their team. 
+    consult Health Canada. 
 License: GPL (>= 2)
+URL: https://github.com/ezyndukwe/dpdquery
+BugReports: https://github.com/ezyndukwe/dpdquery/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

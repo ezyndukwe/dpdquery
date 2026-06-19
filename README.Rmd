@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# dpdquery
+# R/dpdquery
 
 ## Overview
 
@@ -31,6 +31,14 @@ I did not make this package as an employee of Health Canada, nor did I
 receive any form of payment for making this package. For more
 information regarding the DPD and the information provided, please
 consult Health Canada resources and contact their team.
+
+- [Drug Product Database: Access the
+  database](https://www.canada.ca/en/health-canada/services/drugs-health-products/drug-products/drug-product-database.html)
+
+- [Drug Product Database (DPD) API
+  Guide](https://health-products.canada.ca/api/documentation/dpd-documentation-en.html)
+
+  ------------------------------------------------------------------------
 
 ## Installation
 
@@ -67,6 +75,8 @@ comprehensive query that replicates the results of the online DPD query.
 You can query the DPD by active ingredient, brand name (product name),
 DIN or drug code. You can also use functions that start with "`search_`"
 to access the component APIs.
+
+------------------------------------------------------------------------
 
 ## Vignette
 
