@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r eval=FALSE, include=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -15,18 +15,15 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-knitr::opts_chunk$set(
-	message = FALSE,
-	warning = FALSE,
-	include = FALSE
-)
+library(yourpackage)
 ```
+
+# Suggested workflow
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(dpdquery)
 ```
 
-# Suggested workflow
 
 This document shows a suggested for researchers or organizations who use the Drug Product Database from Health Canada. The provided example will be on Ozempic and generic versions of semaglutide products.
 
@@ -34,7 +31,7 @@ This document shows a suggested for researchers or organizations who use the Dru
 
 On January 4, 2018, Health Canada approved Ozempic (semaglutide injection) for adults with type 2 diabetes mellitus. With that, we know the injection pens are available with different dosage strengths. We can use the `search_dp_api()` function to search for different dosage strengths that Ozempic comes in. At the time of this search, 6 products have been approved.
 
-```{r query_brand_name}
+```{r query_brand_name, echo=TRUE}
 ozempic_search <- search_dp_api(brand_name = 'ozempic')
 ozempic_search
 
@@ -70,7 +67,7 @@ For individuals who wish to retrieve all the same information found in the DPD o
 
 Continuing off the Ozempic thread, you can use the function `query_dpd_by_brandName()` to search the DPD for information on Ozempic drug products.
 
-```{r quering_DPD_by_brandName}
+```{r quering_DPD_by_brandName, echo=TRUE}
 ozempic_query_by_BN <- query_dpd_by_brandName('ozempic')
 ```
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/active_ingredients.R
 \name{search_ai_api}
 \alias{search_ai_api}
-\title{Return data frame of results from Active Ingredients API of the Drug Product Database}
+\title{Return data frame of results from Active Ingredients API query of the Drug Product Database}
 \usage{
 search_ai_api(
   active_ingredient = NULL,

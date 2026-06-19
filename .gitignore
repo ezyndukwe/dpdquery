@@ -3,5 +3,8 @@
 .RData
 .Ruserdata
 .positai
+.Rmd
 inst/doc
 docs
+/doc/
+/Meta/

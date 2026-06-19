@@ -1,35 +1,63 @@
 README
 ================
 Ezinne Ndukwe
-2026-06-19
 
-## R Markdown
+# dpdquery
 
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see <http://rmarkdown.rstudio.com>.
+## Overview
 
-When you click the **Knit** button a document will be generated that
-includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
+The DPD Query package (dpdquery) is a suite of functions designed to
+query Health Canada’s Drug Product Database (DPD) through component
+APIs. The DPD is managed by Health Canada and provides information on
+drugs approved and authorized for sale in Canada.
+
+This package is intended to assist with queries of the DPD. The results
+are returned in an R-based structured data frame that can be exported to
+external files.
+
+I did not make this package as an employee of Health Canada, nor did I
+receive any form of payment for making this package. For more
+information regarding the DPD and the information provided, please
+consult Health Canada resources and contact their team.
+
+## Installation
 
 ``` r
-summary(cars)
+# Install development version from GitHub
+# install.packages("devtools")
+devtools::install_github("ezyndukwe/dpdquery", upgrade = 'never')
+library(dpdquery)
 ```
 
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
+## Purpose
 
-## Including Plots
+As a researcher in pharmcoepidemiology, I realized that I could not find
+a way to export the results of the Health Canada Drug Product Database
+online query. I made this package to integrate the results of the online
+query into my R-based environment. The package returns results in data
+frame which can then be written into tabular data files and used in many
+programming software.
 
-You can also embed plots, for example:
+This package is designed to query the DPD in a replicable, verifiable
+and efficient process. Using the `query_dpd_by_activeIngredient()`
+function in this package, I was able to search the entire DPD for 35
+diabetic active ingredients and retrieve information on 990 drug
+products in a structured table in just 13 minutes. I was able to review
+the output results and confirm that the active ingredient terms that did
+not return any drug products were not available in Canada (and not
+typos).
 
-![](README_files/figure-gfm/pressure-1.png)<!-- -->
+For individuals who wish to retrieve all the same information found in
+the DPD online query but using an R-based tool, this package is for you!
+You can use the functions in the package that being with
+“`query_dpd_by_`” to access multiple component APIs of the DPD and run a
+comprehensive query that replicates the results of the online DPD query.
+You can query the DPD by active ingredient, brand name (product name),
+DIN or drug code. You can also use functions that start with “`search_`”
+to access the component APIs.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to
-prevent printing of the R code that generated the plot.
+## Vignette
+
+For an examples of a workflow using the dpdquery, please see the
+vignette I prepared which can be accessed with the code
+`vignette(package = 'dpdquery')`.
