@@ -42,7 +42,7 @@ consult Health Canada resources and contact their team.
 
 ## Installation
 
-```{r installation message=FALSE, warning=FALSE}
+```{r installation, message=FALSE, warning=FALSE}
 
 # Install devtools package
 # install.packages("devtools")
