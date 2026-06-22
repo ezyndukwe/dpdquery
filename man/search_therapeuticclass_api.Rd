@@ -30,7 +30,7 @@ A function that queries the Therapeutic Class API using drug codes and returns a
 search_therapeuticclass_api(drug_code = 3847)
 }
 \seealso{
-\code{\link[=therapeuticclass_api]{therapeuticclass_api()}}
+\code{\link[=therapeuticclass_api]{therapeuticclass_api()}}, \code{\link[=query_dpd_by_atc]{query_dpd_by_atc()}}
 }
 \author{
 Ezinne MM Ndukwe

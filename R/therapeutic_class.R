@@ -40,7 +40,7 @@ therapeuticclass_api <- function(drug_code=NULL) {
 #' @author Ezinne MM Ndukwe
 #' @examples
 #' search_therapeuticclass_api(drug_code = 3847)
-#' @seealso [therapeuticclass_api()]
+#' @seealso [therapeuticclass_api()], [query_dpd_by_atc()]
 #' @source <https://health-products.canada.ca/api/documentation/dpd-documentation-en.html>
 #' @export
 
