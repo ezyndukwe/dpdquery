@@ -42,7 +42,7 @@ consult Health Canada resources and contact their team.
 
 ## Installation
 
-```{r message=FALSE, warning=FALSE}
+```{r installation message=FALSE, warning=FALSE}
 
 # Install devtools package
 # install.packages("devtools")
@@ -84,9 +84,10 @@ individually.
 
 ## Vignette
 
-For an examples of workflow using the dpdquery, please see the vignette
-I prepared which can be accessed with the code
-`vignette(package = 'dpdquery')`.
+For an examples of workflows using the dpdquery, please see a list of
+all the vignettes I prepared with `vignette(package = 'dpdquery')`. To
+read a specific vignette, run `browseVignettes(package = 'dpdquery')` or
+`vignette(topic, package = 'dpdquery'`).
 
 ### Topics
 

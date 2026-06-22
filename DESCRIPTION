@@ -34,7 +34,8 @@ Imports:
     purrr (>= 1.0.2),
     tidyr,
     Hmisc,
-    jsonlite
+    jsonlite,
+    usethis
 Config/testthat/edition: 3
 Suggests: 
     knitr,
