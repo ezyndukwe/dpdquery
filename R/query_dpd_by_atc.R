@@ -10,14 +10,14 @@
 
 #'
 #' @examples
-#' query_by_atc(atc = c('R03DC03', 'B01AC27', '0'), nest_additional_info = TRUE)
-#' query_by_atc(atc = c('R03DC03 ', '0'), nest_additional_info = TRUE) # adding space to 'R03DC03' to cause invalid value
+#' query_dpd_by_atc(atc = c('R03DC03', 'B01AC27', '0'), nest_additional_info = TRUE)
+#' query_dpd_by_atc(atc = c('R03DC03 ', '0'), nest_additional_info = TRUE) # adding space to 'R03DC03' to cause invalid value
 #' @export
 #'
 #'
 #'
 #'
-query_by_atc <- function(atc,
+query_dpd_by_atc <- function(atc,
                          active_param = NULL,
                          nest_additional_info = FALSE,
                          progress_bar = TRUE,
