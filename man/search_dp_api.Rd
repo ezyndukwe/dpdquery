@@ -9,6 +9,7 @@ search_dp_api(
   drug_identification_number = NULL,
   brand_name = NULL,
   find_ais = TRUE,
+  status = NULL,
   progress_bar = TRUE,
   alert_val_not_found = TRUE
 )
@@ -22,19 +23,24 @@ search_dp_api(
 
 \item{find_ais}{Search DPD to find all active ingredients of the identified drug product. Default is TRUE to find.}
 
+\item{status}{Drug product status code. See \link{status_mapping} dataset for the description of each status code.}
+
 \item{progress_bar}{Show progress bar. If TRUE, progress bar shows with progress messages. Use FALSE to hide.}
 
 \item{alert_val_not_found}{Show alert if a value of the supplied search parameter is not in the API. If TRUE, alerts show (default). Use FALSE to hide.}
 }
 \value{
-Dataframe of the results. Columns are formatted to match the output of the Drug Product Database online query
+Dataframe of the API results. Columns are formatted to match the output of the Drug Product Database online query
 }
 \description{
 A function that queries Drug Product API using drug codes, DINs or brand names and returns a data frame of the results.
 Unlike \code{\link[=drugproduct_api]{drugproduct_api()}}, vectors can be supplied to search parameters to query the API with multiple values.
 }
 \details{
-Results can be unpredictable if more than one search parameters (drug code, DIN and brand name) are used. Only one use one search parameter; the rest should be NULL.
+Results can be unpredictable if more than one search criteria (drug code, DIN and brand name) are used. Only one use one argument; the rest should be NULL.
+}
+\note{
+The status parameter only accepts a single code (numeric or string) or NULL. To avoid errors, please call function without the status argument, then use \code{\link[=search_productstatus_api]{search_productstatus_api()}} to retrieve status codes for identified drug codes, and filter results after merging.
 }
 \examples{
 search_dp_api(drug_code = 3847)
@@ -42,12 +48,13 @@ search_dp_api(drug_code = c("90140", "3847"))
 search_dp_api(drug_identification_number = c("00446564"))
 search_dp_api(brand_name = c("Ozempic"))
 search_dp_api(brand_name = "tobradex") # not case-sensitive
-
+search_dp_api(brand_name = "tobradex", find_ais = F) # no information returned about active ingredients
+search_dp_api(drug_code = c(2,3), status = c(1)) # Drug product codes 2 and 3 are not currently approved
 # Get drug product info for all drug products in DPD
 # search_dp_api()
 }
 \seealso{
-\code{\link[=drugproduct_api]{drugproduct_api()}}
+\code{\link[=drugproduct_api]{drugproduct_api()}}, \code{\link[=query_dpd_by_din]{query_dpd_by_din()}}, \code{\link[=query_dpd_by_brandName]{query_dpd_by_brandName()}}
 }
 \author{
 Ezinne MM Ndukwe

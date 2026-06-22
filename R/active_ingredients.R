@@ -8,8 +8,8 @@
 #' @param active_ingredient Active ingredient (string or vector). Enter term just as you would in the online DPD query (not case-sensitive). Only supply one term.
 #' @param drug_code Code of the drug product.
 #'
-#' @seealso [search_ai_api()]
-#' @return Response from API call as a list.
+#' @seealso [search_ai_api()], [query_dpd_by_activeIngredient()]
+#' @return Response from API call as a list. Information on the names and strengths of queried active ingredients or active ingredients in queried drug products.
 #' @examples
 #' # activeingredient_api() # returns all values in API
 #' # activeingredient_api('semaglutide', drug_code=NULL)
@@ -47,7 +47,7 @@ activeingredient_api <- function(active_ingredient=NULL, drug_code=NULL) {
 #' search_ai_api(c('metformin', 'lixisenatide', 'sitagliptin'))
 #' search_ai_api(drug_code = 96906)
 #' search_ai_api(drug_code = 96906, summarize_drugs=FALSE)
-#' @seealso [activeingredient_api()]
+#' @seealso [activeingredient_api()], , [query_dpd_by_activeIngredient()]
 #' @export
 
 
@@ -117,10 +117,8 @@ search_ai_api <- function(active_ingredient=NULL, drug_code=NULL, return_search_
     Hmisc::label(bound_AI_w_strength$ai_name) <- "A.I. name"
     Hmisc::label(bound_AI_w_strength$strength) <- "Strength"
 
-    message(glue("No results were found in the Active Ingredients API using supplied {param_name} values"))
+    message(glue::glue("No results were found in the Active Ingredients API using supplied {param_name} values"))
     return(bound_AI_w_strength)
-
-    break
   }
 
 

@@ -3,6 +3,9 @@
 \name{productstatus_api}
 \alias{productstatus_api}
 \title{Query Product Status API of the Drug Product Database}
+\source{
+\url{https://health-products.canada.ca/api/documentation/dpd-documentation-en.html}
+}
 \usage{
 productstatus_api(drug_code = NULL)
 }

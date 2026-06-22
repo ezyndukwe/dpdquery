@@ -18,7 +18,7 @@ search_productstatus_api(
 \item{alert_val_not_found}{Show alert if any of the supplied drug code(s) is not in the API. If TRUE, alerts show (default). Use FALSE to hide.}
 }
 \value{
-Dataframe of the results. Columns are formatted to match the output of the Drug Product Database online query
+Dataframe of the results. Columns are formatted to match the output of the Drug Product Database online query.
 }
 \description{
 A function that queries the Product Status API using drug codes and returns a data frame of the results. Unlike productstatus_api(), vectors can be supplied to drug codes parameter to query the API with multiple values.

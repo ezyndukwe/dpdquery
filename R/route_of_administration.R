@@ -75,7 +75,6 @@ search_routeadminstration_api <- function(drug_code, active_param = NULL, progre
     message(glue("No routes of administration information was found for supplied {param_name} values"))
     return(bound_routeadminstration_results)
 
-    break
   }
 
   bound_routeadminstration_results <- bind_rows(found_results) %>%

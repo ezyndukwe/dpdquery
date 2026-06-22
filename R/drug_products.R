@@ -1,22 +1,28 @@
 # Drug Products API ------------------------------------------------------
 
 #' @title Query Drug Product API of the Drug Product Database
-#' @description A function that queries Drug Product API using drug code, DIN, brand name or status.
-#' Results can be unpredictable if more than one search parameters (drug code, DIN and brand name) are used. Recommended to use only one.
-
+#' @description A function that queries Drug Product API using drug code, DIN, brand name, and  status.
+#' Results can be unpredictable if drug code, DIN and brand name search criteria (arguments) are used in conjunction. Recommended to use only one.
+#' The status argument can be used safely in combination with any of the other criteria
 #'
 #' @param drug_code Code of the drug product.
 #' @param brand_name Brand name of the drug product.
 #' @param drug_identification_number Drug Identification Number (DIN) of the drug product as a string.
-#' @param status Drug product status.
+#' @param status Drug product status code. See [status_mapping] dataset for the description of each status code.
 #'
-#' @seealso [search_dp_api()]
-#' @return Response from API call as a list
+#' @seealso
+#' \itemize{
+##'  \item [search_dp_api()], [query_dpd_by_din()], [query_dpd_by_brandName()]
+##'  \item [status_mapping]
+##' }
+#' @return Response from API call as a list. Information on DIN, brand name, company name, class name, therapeutic class name, Active Ingredient Group number and number of active ingredients, last date updated and additional details of drug product.
 #' @author Ezinne MM Ndukwe
 #' @examples
 #' drugproduct_api() # all drug products in the DPD
 #' drugproduct_api(drug_code = 3847)
 #' drugproduct_api(drug_identification_number = '00446564')
+#' drugproduct_api(brand_name = 'apidra')
+#' drugproduct_api(brand_name = 'apidra', status = 3) # Find Apidra products cancelled pre-market
 #' @export
 
 drugproduct_api <- function(drug_code=NULL, drug_identification_number=NULL, brand_name=NULL, status=NULL) {
@@ -45,17 +51,22 @@ drugproduct_api <- function(drug_code=NULL, drug_identification_number=NULL, bra
 #' @description A function that queries Drug Product API using drug codes, DINs or brand names and returns a data frame of the results.
 #' Unlike [drugproduct_api()], vectors can be supplied to search parameters to query the API with multiple values.
 #' @details
-#' Results can be unpredictable if more than one search parameters (drug code, DIN and brand name) are used. Only one use one search parameter; the rest should be NULL.
+#' Results can be unpredictable if more than one search criteria (drug code, DIN and brand name) are used. Only one use one argument; the rest should be NULL.
+#'
+#' @note The status parameter only accepts a single code (numeric or string) or NULL. To avoid errors, please call function without the status argument, then use [search_productstatus_api()] to retrieve status codes for identified drug codes, and filter results after merging.
+#'
 #'
 #' @param drug_code Code of the drug product. Can be string, numeric, vector or list of values
 #' @param drug_identification_number Drug Identification Number (DIN) of the drug product. Can be string or vector of strings.
 #' @param brand_name Brand name (or product name) of the drug product. Can be string or vector of strings.
+#' @param status Drug product status code. See [status_mapping] dataset for the description of each status code.
+
 #' @param find_ais Search DPD to find all active ingredients of the identified drug product. Default is TRUE to find.
 #' @param progress_bar Show progress bar. If TRUE, progress bar shows with progress messages. Use FALSE to hide.
 #' @param alert_val_not_found Show alert if a value of the supplied search parameter is not in the API. If TRUE, alerts show (default). Use FALSE to hide.
 #'
-#' @seealso [drugproduct_api()]
-#' @return Dataframe of the results. Columns are formatted to match the output of the Drug Product Database online query
+#' @seealso [drugproduct_api()], [query_dpd_by_din()], [query_dpd_by_brandName()]
+#' @return Dataframe of the API results. Columns are formatted to match the output of the Drug Product Database online query
 #' @author Ezinne MM Ndukwe
 #' @examples
 #' search_dp_api(drug_code = 3847)
@@ -63,12 +74,17 @@ drugproduct_api <- function(drug_code=NULL, drug_identification_number=NULL, bra
 #' search_dp_api(drug_identification_number = c("00446564"))
 #' search_dp_api(brand_name = c("Ozempic"))
 #' search_dp_api(brand_name = "tobradex") # not case-sensitive
-#'
+#' search_dp_api(brand_name = "tobradex", find_ais = F) # no information returned about active ingredients
+#' search_dp_api(drug_code = c(2,3), status = c(1)) # Drug product codes 2 and 3 are not currently approved
 #' # Get drug product info for all drug products in DPD
 #' # search_dp_api()
 #' @export
 
-search_dp_api <- function(drug_code=NULL, drug_identification_number=NULL, brand_name=NULL, find_ais=TRUE, progress_bar=TRUE, alert_val_not_found=TRUE) {
+search_dp_api <- function(drug_code=NULL, drug_identification_number=NULL, brand_name=NULL, find_ais=TRUE, status= NULL, progress_bar=TRUE, alert_val_not_found=TRUE) {
+
+  if (length(status) > 1) {
+    stop("Please enter 1 status code or NULL to the status argument.")
+  }
 
   # Only 1 param should not be NULL
   dp_params <- list(
@@ -87,29 +103,45 @@ search_dp_api <- function(drug_code=NULL, drug_identification_number=NULL, brand
   }
 
   if (non_null_count == 0) {
+
     param_name <- 'drug_code'
-    message('1. Querying Drug Product API')
-    found_results <- drugproduct_api()
-  }  else {
-  if (non_null_count == 1) {
-    param_name <- names(dp_params)[!map_lgl(dp_params, is.null)][1]
-    param_value <- dp_params[[param_name]]
-
-    if (find_ais == TRUE & progress_bar == TRUE) {
-      message('1. Querying Drug Product API')
+    if (progress_bar == TRUE){
+      if (find_ais == FALSE) {message('Querying Drug Product API')}
+      if (find_ais == TRUE) {message('1. Querying Drug Product API')}
     }
+    found_results <- drugproduct_api(drug_code = NULL, status = status)
 
-    drugproduct_results <- map(param_value,
-                               ~ do.call(drugproduct_api, setNames(list(.x), param_name)),
-                               .progress = progress_bar)
+    } else {
 
-    names(drugproduct_results) <- param_value}
+      if (non_null_count == 1) {
+        param_name <- names(dp_params)[!map_lgl(dp_params, is.null)][1]
+        param_value <- dp_params[[param_name]]
+
+
+        if (progress_bar == TRUE){
+          if (find_ais == FALSE) {message('Querying Drug Product API')}
+          if (find_ais == TRUE) {message('1. Querying Drug Product API')}
+        }
+
+
+        drugproduct_results <- purrr::map(
+          param_value,
+          ~ do.call(
+            drugproduct_api,
+            c(setNames(list(.x), param_name),
+              list(status = status))
+          ),
+          .progress = progress_bar
+        )
+
+        names(drugproduct_results) <- param_value}
 
     found_results <- output_valid_results(
       named_list = drugproduct_results,
       second_element_to_check = "drug_identification_number",
       name_source = param_name,
-      api_name = 'Drug Product'
+      api_name = 'Drug Product',
+      alert_val_not_found = alert_val_not_found
     )
 
   }
@@ -158,8 +190,6 @@ search_dp_api <- function(drug_code=NULL, drug_identification_number=NULL, brand
 
     message(glue("No results were found in Drug Product API using supplied {param_name} values"))
     return(bound_drugproduct_results)
-
-    break
   }
 
   bound_drugproduct_results <- dplyr::bind_rows(found_results)

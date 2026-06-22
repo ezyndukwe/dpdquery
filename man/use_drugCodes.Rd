@@ -8,7 +8,8 @@ use_drugCodes(
   drug_code,
   active_param = NULL,
   progress_bar = TRUE,
-  alert_val_not_found = TRUE
+  alert_val_not_found = TRUE,
+  include_tc = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ use_drugCodes(
 \item{progress_bar}{Show progress bar. If TRUE, progress bar shows (default). Use FALSE to hide.}
 
 \item{alert_val_not_found}{Show alert if a drug code is not in a component API. If TRUE, alerts show (default). Use FALSE to hide.}
+
+\item{include_tc}{Include therapeutic class in search}
 }
 \description{
 Query a group of APIs that can only be queried by drug code and return a data frame.

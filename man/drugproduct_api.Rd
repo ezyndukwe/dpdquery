@@ -18,22 +18,28 @@ drugproduct_api(
 
 \item{brand_name}{Brand name of the drug product.}
 
-\item{status}{Drug product status.}
+\item{status}{Drug product status code. See \link{status_mapping} dataset for the description of each status code.}
 }
 \value{
-Response from API call as a list
+Response from API call as a list. Information on DIN, brand name, company name, class name, therapeutic class name, Active Ingredient Group number and number of active ingredients, last date updated and additional details of drug product.
 }
 \description{
-A function that queries Drug Product API using drug code, DIN, brand name or status.
-Results can be unpredictable if more than one search parameters (drug code, DIN and brand name) are used. Recommended to use only one.
+A function that queries Drug Product API using drug code, DIN, brand name, and  status.
+Results can be unpredictable if drug code, DIN and brand name search criteria (arguments) are used in conjunction. Recommended to use only one.
+The status argument can be used safely in combination with any of the other criteria
 }
 \examples{
 drugproduct_api() # all drug products in the DPD
 drugproduct_api(drug_code = 3847)
 drugproduct_api(drug_identification_number = '00446564')
+drugproduct_api(brand_name = 'apidra')
+drugproduct_api(brand_name = 'apidra', status = 3) # Find Apidra products cancelled pre-market
 }
 \seealso{
-\code{\link[=search_dp_api]{search_dp_api()}}
+\itemize{
+\item \code{\link[=search_dp_api]{search_dp_api()}}, \code{\link[=query_dpd_by_din]{query_dpd_by_din()}}, \code{\link[=query_dpd_by_brandName]{query_dpd_by_brandName()}}
+\item \link{status_mapping}
+}
 }
 \author{
 Ezinne MM Ndukwe

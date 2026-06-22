@@ -31,7 +31,6 @@ query_dpd_by_din <- function(drug_identification_number, active_param=NULL, nest
 
   if (all(is.na(dp_search$company))){
     return(dp_search)
-    break
   }
   dp_search <- dp_search %>%  rename(ai_name = list_AIs, strength = list_AIs_strength)
   dp_search$drug_identification_number <- as.character(dp_search$din)

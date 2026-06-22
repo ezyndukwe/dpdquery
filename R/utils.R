@@ -108,13 +108,14 @@ output_valid_results <- function(named_list, second_element_to_check=NULL, name_
 #' @param active_param Only return dosage forms, schedules and routes of administration that are active. Default is NULL. Use 'yes' to returns parameter values that have a date that is greater than today or no date.
 #' @param progress_bar Show progress bar. If TRUE, progress bar shows (default). Use FALSE to hide.
 #' @param alert_val_not_found Show alert if a drug code is not in a component API. If TRUE, alerts show (default). Use FALSE to hide.
+#' @param include_tc Include therapeutic class in search
 #'
 #' @examples
 #' drug_codes_list <- c(0, 1, 8, 35413)
 #' use_drugcodes(drug_codes_list)
 #' @export
 
-use_drugCodes <- function(drug_code, active_param=NULL, progress_bar=TRUE, alert_val_not_found=TRUE){
+use_drugCodes <- function(drug_code, active_param=NULL, progress_bar=TRUE, alert_val_not_found=TRUE, include_tc = TRUE){
 
   if (progress_bar == TRUE){
     message("Gathering product statuses")
@@ -155,22 +156,28 @@ use_drugCodes <- function(drug_code, active_param=NULL, progress_bar=TRUE, alert
     alert_val_not_found = alert_val_not_found
   )
 
-  if (progress_bar == TRUE){
-    message("Gathering therapeutic class")
+  if (include_tc == TRUE){
+    if (progress_bar == TRUE) {
+      message("Gathering therapeutic class")
+    }
+    therapeuticclass_search <- search_therapeuticclass_api(
+      drug_code = drug_code,
+      progress_bar = progress_bar,
+      alert_val_not_found = alert_val_not_found
+    )
   }
-  therapeuticclass_search <- search_therapeuticclass_api(
-    drug_code = drug_code,
-    progress_bar = progress_bar,
-    alert_val_not_found = alert_val_not_found
-  )
 
   query_using_drugcodes <- status_search %>%
     full_join(schedule_search, by = "drug_code", relationship = "many-to-many") %>%
-    full_join(routeadminstration_search, by = "drug_code", relationship = "many-to-many")  %>%
-    full_join(dosage_search, by = "drug_code", relationship = "many-to-many")%>%
-    full_join(therapeuticclass_search, by = "drug_code", relationship = "many-to-many")%>%
+    full_join(routeadminstration_search, by = "drug_code", relationship = "many-to-many") %>%
+    full_join(dosage_search, by = "drug_code", relationship = "many-to-many")
 
-    # Remove duplicates; keep first row
+  if (include_tc) {
+    query_using_drugcodes <- query_using_drugcodes %>%
+      full_join(therapeuticclass_search, by = "drug_code", relationship = "many-to-many")
+  }
+
+  query_using_drugcodes <- query_using_drugcodes %>%
     distinct()
 
   return(query_using_drugcodes)

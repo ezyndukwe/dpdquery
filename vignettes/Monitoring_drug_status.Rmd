@@ -1,0 +1,140 @@
+---
+title: "Monitoring drug statuses"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Monitoring drug statuses}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(dpdquery)
+library(purrr)
+library(dplyr)
+library(tidyr)
+```
+
+# Case example — flu vaccines
+
+Imagine you are a professional in regulatory affairs, public health, research or clinician interested in staying-up-to-date with seasonal influenza vaccines approved for the current influenza season. The list of authorized influenza vaccines changes constantly as the evidence on immunization and influenza epidemiology develops.
+
+> ## What are influenza vaccine products from the 2025/2026 season are still authorized by Health Canada today?
+
+To answer this question, let's start by making a vector of influenza vaccines that were approved for use for the 2025/2026 season. We can find the vaccines in Appendix B of the "[Statement on seasonal influenza vaccines for 2025–2026](https://www.canada.ca/en/public-health/services/publications/vaccines-immunization/national-advisory-committee-immunization-statement-seasonal-influenza-vaccines-2025-2026.html)" report from the Public Health Agency of Canada.
+
+```{r}
+flu_vaccine_names <- c("fluzone", "Flucelvax", "FluMist", 'fluad', "fluviral", 'influvac', 'supemtek') # Searching the DPD isn't case sensitive
+```
+
+There are 3 ways we can use the tools in the `dpdquery` package for this investigation.
+
+### Method 1: Drug Product API alone
+
+We can call the function `search_dp_api()` using the `status` argument. The argument accepts a single status code. The mapping table `status_mapping` is loaded in this package and connects each status's code to their name.
+
+```{r}
+status_mapping
+```
+
+Based on the definitions of each status given in the [Terminology](https://www.canada.ca/en/health-canada/services/drugs-health-products/drug-products/drug-product-database/terminology.html) page of the Drug Product Database, we are most likely interested in finding influenza vaccines that have current statuses as "Approved" (1), "Marketed" (2), "Dormant" (6), "Authorized By Interim Order" (11), and "Restricted Access" (13). As the `status` argument can only accept a single code (and not a vector or multiple codes), we can use functions in the `purrr` package to apply the `search_dp_api()` function to each elements of a vector of status codes. This will output the results in the form of a (named) list.
+
+```{r}
+
+# Make named vector of status codes
+status_vec <- c(1, 2, 6, 11, 13)
+names(status_vec) <- status_mapping$status_name[
+  match(status_vec, status_mapping$status_code)
+]
+
+results_list <- purrr::imap(status_vec, ~
+                              search_dp_api(
+                                brand_name = flu_vaccine_names,
+                                status = .x,
+                                alert_val_not_found = F,
+                                progress_bar = F
+                              )
+)
+results_list
+```
+
+Looking at `results_list`, we can see that searches for products with statuses "Authorized By Interim Order" and "Restricted Access" didn't return any drug products.
+
+In this package, I also developed a function to help us combine and name lists in one step. To prevent errors with the binding of list elements, we only combine the first 3 list elements (corresponding to Approved-, Marketed- and Dormant-status products).
+
+```{r}
+option1_results <- name_and_bind_list(results_list[1:3], names = names(status_vec[1:3]), names_to = "status_group")
+option1_results
+```
+
+Seventeen influenza vaccines are still available in Canada, 3 of which are only Approved (but not yet marketed), 9 of which are Marketed and the remaining 5 are Dormant (the DINs are still active).
+
+### Method 2: Drug Product API + Product Status API (most efficient)
+
+**Method 1** works for this example as we're only querying the database for 7 vaccines. If our request included more drug products, the intermediate steps necessitating for a manual review of the results before binding the list elements would be increasingly cumbersome and make the workflow inefficient.
+
+If we purely only need to know the status of these drug products, **Method 2** is preferred and the most effieicnt solution. This method uses the Drug Product and Product Status APIs. First, we call `search_dp_api()` like we did before. Instead of including the `status` argument, we call `search_productstatus_api()` and filter the results for active products.
+
+I would like to mention when I first ran this code, the output messages alerted me that 'supemtak' could not be found in the DPD. This made me realize that I had a typo when I was trying to spell *Supemtek*. This alert makes the workflow verifiable. There would have been no way for me to detect typos using **Method 1**.
+
+```{r}
+dp_search <- search_dp_api(brand_name = flu_vaccine_names, find_ais = TRUE) # Additional active ingredients information may be of interest to compare trivalent and quadrivalent vaccines
+
+vaccine_drugcodes <- dp_search$drug_code
+
+# Search Product Status API for the statuses; then filter for codes in status_vec
+prodstat_search <- search_productstatus_api(vaccine_drugcodes)
+available_drugcodes<- prodstat_search %>% 
+  dplyr::filter(external_status_code %in% status_vec)
+
+option2_results <- dp_search %>%
+  right_join(available_drugcodes, by ='drug_code')
+
+option2_results
+option2_results %>% group_by(status) %>% count()
+```
+
+We get the same results as **Method 1**. There are 17 products that are still authorized and available in Canada: 3 Approved status, 9 Marketed status and 5 Dormant status. With this method, however, we don't need to manually review intermediate steps and we get alerted for terms that don't return matches to any products in the DPD (helping us spot errors).
+
+### Method 3: Query entire DPD (most comprehensive)
+
+The most comprehensive search would be calling `query_dpd_by_brandName()`. This would not only return basic information about vaccine products (e.g., brand name, Drug Identification Number (DIN), company, active ingredients) and their status, but also about their dosage forms, schedules, routes of administration, and Anatomical Therapeutic Chemical (ATC) classification.
+
+```{r}
+# Search DPD for all 2025/2026 influenza vaccine products 
+bn_query <- query_dpd_by_brandName(
+  brand_name = flu_vaccine_names, 
+  alert_val_not_found = TRUE, # default; be alerted of no product matches in DPD
+  nest_additional_info = TRUE # less columns in output
+  )
+
+# We nested the additional columns. We only need to pull out external_status_code
+query_unest_status <- bn_query %>% 
+  mutate(external_status_code = map(additional_info, "external_status_code")) %>% 
+  tidyr::unnest_longer(external_status_code) 
+
+# Filter for status codes we need (1, 2, 6, 11 or 13)
+option3_results <- query_unest_status %>%
+  dplyr::filter(external_status_code %in% status_vec)
+
+option3_results
+option3_results %>% group_by(status) %>% count()
+```
+
+We get the same results as **Methods 1 and 2**. Currently, there are 17 vaccines from the 2025/2026 influenza season that are still authorized and available in Canada. Three are approved, 9 are still being marketed, and 5 are dormant. Like **Method 2**, this method also has the functionality to alert users if any of the supplied brand name terms do not return any product matches in the database. This method also does not need manual review during intermediate steps.
+
+## Conclusion
+
+In conclusion, **Methods 2 and 3** provide the best solutions to stay updated on the statuses of drug products that are constantly subject to changes. These products can include vaccines, drugs for rare diseases, newly approved drugs and drugs undergoing post-market safety trials, for example.
+
+- You want to stay up-to-date on a few drug products that share the same DPD status code (e.g., "which of Sanofi's Fluzone vaccines are still marketed in Canada?") → **Method 1**
+
+- You need to search the DPD for many drug products and/or status codes, and don't need more information beyond basic product characteristics (DIN, company, brand name), active ingredients and status → **Method 2**
+
+- You need to search the DPD for many drug products and/or status codes, and want all available information on the returned products → **Method 3**

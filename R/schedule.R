@@ -76,8 +76,6 @@ search_schedule_api <- function(drug_code, active_param=NULL, progress_bar=FALSE
 
     message(glue("No schedule information was found for supplied {param_name} values"))
     return(bound_schedule_results)
-
-    break
   }
 
   bound_schedule_results <- bind_rows(schedule_results) %>%

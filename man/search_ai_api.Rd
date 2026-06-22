@@ -40,5 +40,5 @@ search_ai_api(drug_code = 96906)
 search_ai_api(drug_code = 96906, summarize_drugs=FALSE)
 }
 \seealso{
-\code{\link[=activeingredient_api]{activeingredient_api()}}
+\code{\link[=activeingredient_api]{activeingredient_api()}}, , \code{\link[=query_dpd_by_activeIngredient]{query_dpd_by_activeIngredient()}}
 }

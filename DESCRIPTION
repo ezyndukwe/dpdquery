@@ -5,7 +5,7 @@ Version: 1.0.0.0
 Authors@R: c(
     person(
       "Ezinne", "Ndukwe",
-      email = "ezinne.ndukwe@mail.utoronto.com",
+      email = "ezinne.ndukwe@outlook.com",
       role = c("aut", "cre", "cph")
     )
   )
@@ -41,3 +41,4 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
+LazyData: true

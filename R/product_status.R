@@ -10,6 +10,7 @@
 #' @author Ezinne MM Ndukwe
 #' @examples
 #' productstatus_api(drug_code = 3847)
+#' @source <https://health-products.canada.ca/api/documentation/dpd-documentation-en.html>
 #' @export
 #'
 
@@ -32,7 +33,7 @@ productstatus_api <- function(drug_code=NULL) {
 #' @param progress_bar Show progress bar. If TRUE, progress bar shows (default) with progress messages. Use FALSE to hide.
 #' @param alert_val_not_found Show alert if any of the supplied drug code(s) is not in the API. If TRUE, alerts show (default). Use FALSE to hide.
 #'
-#' @return Dataframe of the results. Columns are formatted to match the output of the Drug Product Database online query
+#' @return Dataframe of the results. Columns are formatted to match the output of the Drug Product Database online query.
 #' @author Ezinne MM Ndukwe
 #' @examples
 #' search_productstatus_api(drug_code = 3847)
@@ -65,8 +66,6 @@ search_productstatus_api <- function(drug_code, progress_bar=FALSE, alert_val_no
 
     message(glue("No product status information was found for supplied {param_name} values"))
     return(bound_productstatus_results)
-
-    break
   }
 
   bound_productstatus_results <- bind_rows(found_results)

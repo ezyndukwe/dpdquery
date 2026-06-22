@@ -4,7 +4,7 @@
 \alias{search_therapeuticclass_api}
 \title{Return data frame of results from Therapeutic Class API of the Drug Product Database}
 \source{
-https://health-products.canada.ca/api/documentation/dpd-documentation-en.html
+\url{https://health-products.canada.ca/api/documentation/dpd-documentation-en.html}
 }
 \usage{
 search_therapeuticclass_api(

@@ -12,7 +12,7 @@ activeingredient_api(active_ingredient = NULL, drug_code = NULL)
 \item{drug_code}{Code of the drug product.}
 }
 \value{
-Response from API call as a list.
+Response from API call as a list. Information on the names and strengths of queried active ingredients or active ingredients in queried drug products.
 }
 \description{
 A function that queries the Active Ingredient API of the DPD using drug codes or search terms of active ingredients.
@@ -25,7 +25,7 @@ Use \code{\link[=search_ai_api]{search_ai_api()}} if you wish to query the API u
 # map(c('semaglutide', 'metformin'), activeingredient_api)
 }
 \seealso{
-\code{\link[=search_ai_api]{search_ai_api()}}
+\code{\link[=search_ai_api]{search_ai_api()}}, \code{\link[=query_dpd_by_activeIngredient]{query_dpd_by_activeIngredient()}}
 }
 \author{
 Ezinne MM Ndukwe

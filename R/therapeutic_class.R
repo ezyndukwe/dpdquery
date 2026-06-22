@@ -41,11 +41,14 @@ therapeuticclass_api <- function(drug_code=NULL) {
 #' @examples
 #' search_therapeuticclass_api(drug_code = 3847)
 #' @seealso [therapeuticclass_api()]
-#' @source https://health-products.canada.ca/api/documentation/dpd-documentation-en.html
+#' @source <https://health-products.canada.ca/api/documentation/dpd-documentation-en.html>
 #' @export
 
 search_therapeuticclass_api <- function(drug_code, progress_bar=FALSE, alert_val_not_found=TRUE) {
 
+  if (is.null(drug_code)){
+    found_results <- therapeuticclass_api()
+  } else{
   param_name <- 'drug_code'
   param_value <- drug_code
 
@@ -59,6 +62,7 @@ search_therapeuticclass_api <- function(drug_code, progress_bar=FALSE, alert_val
     name_source = param_name,
     alert_val_not_found = alert_val_not_found
   )
+  }
 
   if (length(found_results) == 0){
     bound_therapeuticclass_results <- data.frame(
@@ -75,7 +79,6 @@ search_therapeuticclass_api <- function(drug_code, progress_bar=FALSE, alert_val
     message(glue("No therapeutic class information was found for supplied {param_name} values"))
     return(bound_therapeuticclass_results)
 
-    break
   }
 
   bound_therapeuticclass_results <- bind_rows(found_results)

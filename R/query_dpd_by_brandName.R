@@ -22,7 +22,6 @@ query_dpd_by_brandName <- function(brand_name, active_param=NULL, nest_additiona
   dp_search <- search_dp_api(brand_name = dedup_bns, find_ais = TRUE, progress_bar = progress_bar, alert_val_not_found = alert_val_not_found)
   if (all(is.na(dp_search$company))){
     return(dp_search)
-    break
   }
   dp_search <- dp_search %>%  rename(ai_name = list_AIs, strength = list_AIs_strength)
 

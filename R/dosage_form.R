@@ -66,11 +66,10 @@ search_dosageform_api <- function(drug_code, active_param=NULL, progress_bar=FAL
 
     Hmisc::label(bound_dosageform_results$dosage_forms) <- "Dosage form(s)"
 
+    message(glue::glue("No results were found in Dosage Form API using supplied {param_name} values"))
+
     return(bound_dosageform_results)
 
-    message(glue("No results were found in Dosage Form API using supplied {param_name} values"))
-
-    break
   }
 
   bound_dosageform_results <- bind_rows(found_results) %>%

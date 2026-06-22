@@ -9,7 +9,8 @@ query_dpd_by_drugCode(
   active_param = NULL,
   nest_additional_info = FALSE,
   progress_bar = TRUE,
-  alert_val_not_found = TRUE
+  alert_val_not_found = TRUE,
+  include_tc = TRUE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ query_dpd_by_drugCode(
 \item{progress_bar}{Show progress bar. If TRUE, progress bar shows (default). Use FALSE to hide.}
 
 \item{alert_val_not_found}{Show alert if a drug code is not in a component API. If TRUE, alerts show (default). Use FALSE to hide.}
+
+\item{include_tc}{Include therapeutic class information (e.g., Anatomical Therapeutic Chemical Code).}
 }
 \description{
 A function that queries the DPD by drug codes(s) and returns a data frame of the results.
