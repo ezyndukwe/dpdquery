@@ -1,5 +1,6 @@
 ---
 title: "Monitoring drug statuses"
+date: "2026-06-22"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Monitoring drug statuses}
@@ -14,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, message=FALSE}
 library(dpdquery)
 library(purrr)
 library(dplyr)
@@ -25,7 +26,7 @@ library(tidyr)
 
 Imagine you are a professional in regulatory affairs, public health, research or clinician interested in staying-up-to-date with seasonal influenza vaccines approved for the current influenza season. The list of authorized influenza vaccines changes constantly as the evidence on immunization and influenza epidemiology develops.
 
-> ## What are influenza vaccine products from the 2025/2026 season are still authorized by Health Canada today?
+> ## What influenza vaccine products from the 2025/2026 season are still authorized by Health Canada today?
 
 To answer this question, let's start by making a vector of influenza vaccines that were approved for use for the 2025/2026 season. We can find the vaccines in Appendix B of the "[Statement on seasonal influenza vaccines for 2025–2026](https://www.canada.ca/en/public-health/services/publications/vaccines-immunization/national-advisory-committee-immunization-statement-seasonal-influenza-vaccines-2025-2026.html)" report from the Public Health Agency of Canada.
 
@@ -49,28 +50,33 @@ Based on the definitions of each status given in the [Terminology](https://www.c
 
 # Make named vector of status codes
 status_vec <- c(1, 2, 6, 11, 13)
-names(status_vec) <- status_mapping$status_name[
-  match(status_vec, status_mapping$status_code)
-]
+names(status_vec) <- status_mapping$status_name[match(status_vec, status_mapping$status_code)]
 
 results_list <- purrr::imap(status_vec, ~
                               search_dp_api(
                                 brand_name = flu_vaccine_names,
                                 status = .x,
-                                alert_val_not_found = F,
+                                alert_val_not_found = T, 
+                                  # output is messy but message "No results were found in Drug Product API using supplied brand_name values" means no 2025/2026 flu vaccines found for that status code
                                 progress_bar = F
                               )
 )
-results_list
+
+# Some status codes didn't return any matches. The dataframes of these results will have the brand_names column filled but everything else will be NA
+# Because we searched on brand_names; look for rows where drug_codes is not NA (all matched drug products have am indexed drug code in the DPD)
+purrr::map(
+  results_list,
+  ~ .x %>% filter(!is.na(drug_code)) %>% select(drug_code, product, company, din)
+)
 ```
 
 Looking at `results_list`, we can see that searches for products with statuses "Authorized By Interim Order" and "Restricted Access" didn't return any drug products.
 
-In this package, I also developed a function to help us combine and name lists in one step. To prevent errors with the binding of list elements, we only combine the first 3 list elements (corresponding to Approved-, Marketed- and Dormant-status products).
+In this package, I also developed a function to help us bind and name lists in one step. To prevent errors with the binding of list elements, we only combine the first 3 list elements (corresponding to Approved-, Marketed- and Dormant-status products).
 
 ```{r}
 option1_results <- name_and_bind_list(results_list[1:3], names = names(status_vec[1:3]), names_to = "status_group")
-option1_results
+option1_results[c("status_group", "product", "company", "din")]
 ```
 
 Seventeen influenza vaccines are still available in Canada, 3 of which are only Approved (but not yet marketed), 9 of which are Marketed and the remaining 5 are Dormant (the DINs are still active).
@@ -79,7 +85,7 @@ Seventeen influenza vaccines are still available in Canada, 3 of which are only 
 
 **Method 1** works for this example as we're only querying the database for 7 vaccines. If our request included more drug products, the intermediate steps necessitating for a manual review of the results before binding the list elements would be increasingly cumbersome and make the workflow inefficient.
 
-If we purely only need to know the status of these drug products, **Method 2** is preferred and the most effieicnt solution. This method uses the Drug Product and Product Status APIs. First, we call `search_dp_api()` like we did before. Instead of including the `status` argument, we call `search_productstatus_api()` and filter the results for active products.
+If we purely only need to know the status of these drug products, **Method 2** is preferred and the most efficient solution. This method uses the Drug Product and Product Status APIs. First, we call `search_dp_api()` like we did before. Instead of including the `status` argument, we call `search_productstatus_api()` and filter the results for active products.
 
 I would like to mention when I first ran this code, the output messages alerted me that 'supemtak' could not be found in the DPD. This made me realize that I had a typo when I was trying to spell *Supemtek*. This alert makes the workflow verifiable. There would have been no way for me to detect typos using **Method 1**.
 
@@ -96,7 +102,7 @@ available_drugcodes<- prodstat_search %>%
 option2_results <- dp_search %>%
   right_join(available_drugcodes, by ='drug_code')
 
-option2_results
+option2_results[c("status",'external_status_code', "product", "drug_code")]
 option2_results %>% group_by(status) %>% count()
 ```
 
@@ -110,7 +116,7 @@ The most comprehensive search would be calling `query_dpd_by_brandName()`. This 
 # Search DPD for all 2025/2026 influenza vaccine products 
 bn_query <- query_dpd_by_brandName(
   brand_name = flu_vaccine_names, 
-  alert_val_not_found = TRUE, # default; be alerted of no product matches in DPD
+  alert_val_not_found = TRUE, # default; be alerted of no product matches in DPD and component APIs
   nest_additional_info = TRUE # less columns in output
   )
 
@@ -123,7 +129,6 @@ query_unest_status <- bn_query %>%
 option3_results <- query_unest_status %>%
   dplyr::filter(external_status_code %in% status_vec)
 
-option3_results
 option3_results %>% group_by(status) %>% count()
 ```
 
@@ -133,7 +138,7 @@ We get the same results as **Methods 1 and 2**. Currently, there are 17 vaccines
 
 In conclusion, **Methods 2 and 3** provide the best solutions to stay updated on the statuses of drug products that are constantly subject to changes. These products can include vaccines, drugs for rare diseases, newly approved drugs and drugs undergoing post-market safety trials, for example.
 
-- You want to stay up-to-date on a few drug products that share the same DPD status code (e.g., "which of Sanofi's Fluzone vaccines are still marketed in Canada?") → **Method 1**
+- You want to stay up-to-date on a couple of drug products that share the same DPD status code (e.g., "which of Sanofi's Fluzone vaccines are still marketed in Canada?") → **Method 1**
 
 - You need to search the DPD for many drug products and/or status codes, and don't need more information beyond basic product characteristics (DIN, company, brand name), active ingredients and status → **Method 2**
 
