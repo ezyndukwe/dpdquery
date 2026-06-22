@@ -24,7 +24,7 @@ This document shows a suggested for researchers or organizations who use the Dru
 
 ## Scoping for products with a given brand name
 
-On January 4, 2018, Health Canada approved Ozempic (semaglutide injection) for adults with type 2 diabetes mellitus. With that, we know the injection pens are available with different dosage strengths. We can use the `search_dp_api()` function (with the default `find_ais=TRUE`) to search for different dosage strengths that Ozempic comes in. At the time of this search, 6 products have been approved.
+On January 4, 2018, Health Canada approved Ozempic (semaglutide injections) for adults with type 2 diabetes mellitus. With that, we know the injection pens are available with different dosage strengths. We can use the `search_dp_api()` function (with the default `find_ais=TRUE`) to search for different dosage strengths that Ozempic comes in. At the time of this search, 6 products have been approved.
 
 ```{r query_brand_name, echo=TRUE}
 ozempic_search <- search_dp_api(brand_name = 'ozempic')
